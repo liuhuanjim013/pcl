@@ -436,12 +436,25 @@ macro(PCL_MAKE_PKGCONFIG _name _component _desc _pcl_deps _ext_deps _int_deps _c
     endforeach(_dep)
 
     set(_pc_file ${CMAKE_CURRENT_BINARY_DIR}/${_name}-${PCL_MAJOR_VERSION}.${PCL_MINOR_VERSION}.pc)
-    configure_file(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake.in ${_pc_file}
-        @ONLY)
+    # Cannot use ARGN directly with list() command.
+    # Copy to a variable first.
+    set (extra_macro_args ${ARGN})
+
+    # Did we get any optional args?
+    list(LENGTH extra_macro_args num_extra_args)
+    if (${num_extra_args} GREATER 0)
+        list(GET extra_macro_args 0 optional_arg)
+        if (${optional_arg} STREQUAL "nolib")
+          configure_file(${PROJECT_SOURCE_DIR}/cmake/pkgconfig-nolib.cmake.in ${_pc_file} @ONLY)
+        else()
+          configure_file(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake.in ${_pc_file} @ONLY)
+        endif()
+    else()
+      configure_file(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake.in ${_pc_file} @ONLY)
+    endif ()
     install(FILES ${_pc_file} DESTINATION ${PKGCFG_INSTALL_DIR}
         COMPONENT pcl_${_component})
 endmacro(PCL_MAKE_PKGCONFIG)
-
 
 ###############################################################################
 # PRIVATE
