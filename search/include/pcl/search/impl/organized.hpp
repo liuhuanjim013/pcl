@@ -353,12 +353,12 @@ pcl::search::OrganizedNeighbor<PointT>::estimateProjectionMatrix ()
   
   for (unsigned yIdx = 0, idx = 0; yIdx < input_->height; yIdx += ySkip, idx += input_->width * (ySkip - 1))
   {
-    for (unsigned xIdx = 0; xIdx < input_->width; xIdx += xSkip, idx += xSkip)
+      for (unsigned xIdx = 0, idx2 = idx; xIdx < input_->width; xIdx += xSkip, idx2 += xSkip)
     {
-      if (!mask_ [idx])
+      if (!mask_ [idx2])
         continue;
 
-      indices.push_back (idx);
+      indices.push_back (idx2);
     }
   }
 
